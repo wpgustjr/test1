@@ -106,26 +106,39 @@
     </div>    
   </div>
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
+ <script>
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const found = users.find(u => u.username === user && u.password === pass);
-
-      const resultTag = document.getElementById("result");
-      if (found) {
-        resultTag.innerText = "로그인 성공!";
-        resultTag.style.color = "green";
-        localStorage.setItem("currentUser", user);
-        window.location.href = "https://finance.naver.com/item/main.nhn?code=005930";
-      } else {
-        resultTag.innerText = "아이디 또는 비밀번호가 틀렸습니다.";
-        resultTag.style.color = "red";
+    fetch("https://test1-zcyn.onrender.com/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("로그인 실패");
       }
+      return res.json();
+    })
+    .then(data => {
+      const resultTag = document.getElementById("result");
+      resultTag.innerText = data.message;
+      resultTag.style.color = "green";
+      // 로그인 성공 시 원하는 페이지로 이동
+      window.location.href = "https://finance.naver.com/item/main.nhn?code=005930";
+    })
+    .catch(err => {
+      const resultTag = document.getElementById("result");
+      resultTag.innerText = "아이디 또는 비밀번호가 틀렸습니다.";
+      resultTag.style.color = "red";
     });
-  </script>
+  });
+</script>
+
 </body>
 </html>
